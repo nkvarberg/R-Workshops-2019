@@ -1,0 +1,435 @@
+---
+title: "Intoduction to R"
+author: "LISA + CRDDS"
+date: "September 11, 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+options(max.print=20)
+```
+
+![](LISA_pic.jpg)
+
+# Agenda
+
+1. Resources
+
+2. Preliminaries
+
+3. Base Functions
+
+4. Tidy Data
+
+5. Data Wrangling
+
+6. Data Visualization
+
+7. Test Your Skills
+
+8. How to Research R
+
+# Resources
+
+#### R for Data Science - Book
+
+*  http://r4ds.had.co.nz
+
+#### Base R cheat sheet
+
+* https://www.rstudio.com/wp-content/uploads/2016/05/base-r.pdf
+
+#### R markdown cheat sheet
+
+* https://www.rstudio.com/wp-content/uploads/2015/02/rmarkdown-cheatsheet.pdf
+
+#### dyplyr cheat sheet - data wrangling
+
+* https://www.rstudio.com/wp-content/uploads/2015/02/data-wrangling-cheatsheet.pdf
+
+#### ggplot cheat sheet - data visualization
+
+* https://www.rstudio.com/wp-content/uploads/2015/03/ggplot2-cheatsheet.pdf
+
+# Preliminaries
+
+#### 1. R Studio Interface
+
+* Console
+
+* Environment
+
+* File Window
+
+* Viewer Window
+
+* History
+
+* Plots
+
+* Help
+
+* Packages
+
+#### 2. Creating Scripts
+Create a script to keep track of your analysis. Save the script where you want it.
+
+#### 3. Working Directory
+Set the working directory. This tells R where to look for files. Click Session - Set Working Directory - To source file location. Any data files that you want to analyze should be placed here. Also any data files that you save will be saed here.
+
+```{r echo = TRUE, message = F, warning = F}
+getwd()
+#setwd("C:/Users/nickvarberg/Desktop/Work/R Shortcourses 2019")
+```
+
+#### 4. Packages 
+Packages that we will need for today.
+
+* **tidyverse**: "The tidyverse is an opinionated collection of R packages designed for data science. All packages share an underlying design philosophy, grammar, and data structures." - Taken directly from their website
+
+* **fivethirtyeight**: A collection of interesting datasets to analyze.
+
+All of you should have come ready with the tidyverse installed. Many of you will likely not have the the fivethirtyeight package downloaded. How can we install this package to our computer?
+
+## <span style="color:purple">Exercise 1:</span>
+Install the fivethirtyeight package.
+
+```{r echo = TRUE, message = F, warning = F}
+library(tidyverse)
+library(fivethirtyeight)
+```
+
+#### 5. Import Dataset
+Now it's time to load the dataset. Note that we will be using a built-in dataset from the fivethirtyeight package that contains information on US Births from 1994 to 2003. If you are importing your own dataset, we address this later in the workshop. Please see the script "r_zero.r" on our OSF site for more information on this. (or just google it). Here is how we load the data from the fivethirtyeight package.
+
+```{r echo = TRUE, message = F, warning = F}
+data <- US_births_1994_2003
+```
+
+# Base Functions
+Here we list some functions that come in the base pacage of R. We can use these functions to get some basic information on our dataset. 
+
+#### 1. Dimensions
+Compute the dimensions of the data frame.
+
+```{r echo = TRUE, message = F, warning = F}
+dim(data)
+```
+
+#### 2. Number of Rows
+Compute the number of rows of the data frame.
+
+```{r echo = TRUE, message = F, warning = F}
+nrow(data)
+```
+
+#### 3. Number of Columns
+Compute the number of columns of the data frame.
+
+```{r echo = TRUE, message = F, warning = F}
+ncol(data)
+```
+
+#### 4. Column names
+Display the column names of the data frame.
+
+```{r echo = TRUE, message = F, warning = F}
+colnames(data)
+```
+
+#### 5. Head of the data
+Display the first few rows of the data frame.
+
+```{r echo = TRUE, message = F, warning = F}
+head(data)
+```
+
+## <span style="color:red">Tidy Data</span>
+Our goal is to have our data "Tidy". Tidy data has two key features. (1) Each row represents a case (ie. observational unit of the sample). (2) Each column represents a variable (ie. an attribute of the cases). Here cases are individual days and variables include month, year, and births. We can always tidy up our data if it comes to us in a non-tidy format using data wrangling techniques which will be addressed in a bit.
+
+#### 6. Structure of the data
+Display the data structures for each column.
+
+```{r echo = TRUE, message = F, warning = F}
+str(data)
+```
+
+## <span style="color:red">Data Structures</span>
+A list of common data types.
+
+* int - integer
+
+* numeric - number
+
+* factor - group
+
+* logical - True/False
+
+* Date - date
+
+<span style="color:red">Note:</span> Sometimes when your data is loaded, R will recognize a column with an incorrect structure. For example, column b is a string but we want it to be numeric. We change it using as.numeric().
+
+```{r echo = TRUE, message = F, warning = F}
+b <- c("2.0", "3.5", "56.0") 
+str(b)
+b <- as.numeric(b)
+str(b)
+```
+
+#### 7. Column Access
+Access a column by its name.
+
+```{r echo = TRUE, message = F, warning = F}
+births <- data$births
+births
+```
+
+## <span style="color:purple">Exercise 2:</span>
+Extract the day of the week column into a vector. Try to convert the column into a numeric vector and see what happens.
+
+#### 8. Unique elements of a column
+Get the unique elements of a column in a data frame.
+
+```{r echo = TRUE, message = F, warning = F}
+# Get the unique years of the data
+years <- unique(data$year)
+years
+```
+
+#### 9. Maximum of a column
+Find the maximum element of a vector.
+
+```{r echo = TRUE, message = F, warning = F}
+maxbirths <- max(births)
+maxbirths
+```
+
+#### 10. Index of maximum
+Find the index where a maximum occurrs.
+
+```{r echo = TRUE, message = F, warning = F}
+# Find the date of the maximum births
+maxindex <- which.max(births)
+maxdate <- data$date[maxindex]
+maxdate
+```
+
+## <span style="color:purple">Exercise 3:</span>
+Find the day where the least number of births occurred for our dataset and also find the least number of births.
+
+#### 11. Mean
+Compute the mean of a vector.
+
+```{r echo = TRUE, message = F, warning = F}
+# Compute the average number of births in a given day
+mean(births)
+```
+
+#### 11. Standard Deviation
+Compute the standard deviation of a vector.
+
+```{r echo = TRUE, message = F, warning = F}
+# Compute the standard deviation of the number of births in a given day
+sd(births)
+```
+
+# Data Wrangling
+There are many useful functions for altering your data frame. 
+
+#### 1. View Dataset
+View the data frame in a new window.
+
+```{r echo = TRUE, message = F, warning = F}
+# Display data frame
+View(data)
+```
+
+#### 2. Order Data Frame
+Order the data frame by a certain column (default is descending order).
+
+```{r echo = TRUE, message = F, warning = F}
+# Order by number of births
+data <- data %>% arrange(desc(births))
+head(data)
+```
+
+```{r}
+data <- data %>% arrange(year)
+head(data)
+```
+
+#### 3. Rename Columns
+Rename specific columns of your data. 
+
+```{r echo = TRUE, message = F, warning = F}
+# Rename dat_of_month and day_of_week columns
+data <- data %>% rename(day = date_of_month, weekday = day_of_week)
+```
+
+#### 4. Filter Rows
+Select rows of a data frame based on a certain condition.
+
+```{r echo = TRUE, message = F, warning = F}
+# Select days only in the month of July and do the same for Jan
+july_data <- data %>% filter(month == 7)
+jan_data <- data %>% filter(month == 1)
+# Select days only in the month of january
+jan_2000_data <- data %>% filter(month == 1 & year == 2000)
+dim(jan_2000_data)
+```
+
+## <span style="color:purple">Exercise 4:</span>
+Filter out the data for the first half of the year (January through June).
+
+#### 5. Select Columns
+Select specific columns of a data frame.
+
+```{r echo = TRUE, message = F, warning = F}
+# Select days only the columns of date and births
+selected_data <- data %>% select(date, births)
+```
+
+## <span style="color:purple">Exercise 5:</span>
+Select the columns for year, day, and births out of july_data.
+
+```{r echo = TRUE, message = F, warning = F}
+# Select days only in the month of July
+july_data <- july_data %>% select(year,day,births)
+```
+
+#### 6. Separate Columns
+Separate one column into several.
+
+```{r echo = TRUE, message = F, warning = F}
+# Separate date of selected_data into 3 columns
+parsed_data <- selected_data %>% separate(date, c('y','m','d'))
+```
+
+#### 7. Creating Columns
+Add an additional column to the data frame.
+
+```{r echo = TRUE, message = F, warning = F}
+# Create a column that indicates if it is a summer month (June, July, August).
+data <- data %>% mutate(summer = between(month,6,8))
+str(data)
+```
+
+## <span style="color:purple">Exercise 6:</span>
+Create a column keeping track of the cumulative total of births. Hint: use the summary function "cumsum(colname)".
+
+#### 8. Summarizing
+Compute summary statistics of your data frame. 
+
+```{r echo = TRUE, message = F, warning = F}
+# Compute the mean number of births for a given day
+overall_mean <- data %>% summarise(average = mean(births))
+```
+
+#### 9. Grouping by variables
+Separate one column into several.
+
+```{r echo = TRUE, message = F, warning = F}
+# Compute the mean and median number of births by weekday
+weekday_mean <- data %>%
+  group_by(weekday) %>%
+  summarise(average = mean(births))
+```
+
+## <span style="color:purple">Exercise 7:</span>
+Compute the average number of births by year, along with the standard deviation.
+
+#### 10. Binding Rows
+Bind two dataframes together by row.
+
+```{r echo = TRUE, message = F, warning = F}
+# Bind data frames by row
+janjul_data <- jan_data %>%
+  bind_rows(july_data)
+```
+
+#### 11. Joining Data frames
+Bind two dataframes together by similar columns.
+
+```{r echo = TRUE, message = F, warning = F}
+# Join two data frames together
+joined_data <- jan_data %>%
+  left_join(july_data, by = c("year","day"))
+```
+
+## <span style="color:purple">Exercise 8:</span>
+Rename the new columns of joined_data.
+
+#### 12. Gather columns into rows
+Separate multiple columns into one.
+
+```{r echo = TRUE, message = F, warning = F}
+# Select days only in the month of July
+gathered_data <- joined_data %>%
+  gather(key = month, value = births, c("births.x","births.y"))
+# key: column name representing new variable
+# value: column name representing variable values
+# remaining: columns to gather
+```
+
+#### 13. Saving Data Frames
+Save the data frame to a .csv file.
+
+```{r echo = TRUE, message = F, warning = F}
+write.csv(gathered_data, "mydataframe.csv")
+```
+
+## <span style="color:purple">Exercise 9:</span>
+Save one of your data frames in your environment to a csv.
+
+#### 14. Loading Data Frames
+Read a .csv file into R.
+
+```{r echo = TRUE, message = F, warning = F}
+loaded_data <- read.csv("mydataframe.csv")
+```
+
+# Basic Data Visualization
+
+#### 1. Create a histogram for births
+
+```{r echo = TRUE, message = F, warning = F}
+# Histogram of births
+ggplot(data = data, aes(x=births)) +
+  geom_histogram(bins = 30)
+```
+
+#### 2. Plot the number of births as a function of time.
+
+```{r echo = TRUE, message = F, warning = F}
+# Scatter plot of births
+ggplot(data = data, aes(x=c(1:nrow(data)), y = births)) + 
+  geom_point()
+```
+
+#### 3. Create a boxplot of births by month
+```{r echo = TRUE, message = F, warning = F}
+# Boxplot of births by month
+ggplot(data = data, aes(x=as.factor(month), y = births)) +
+  geom_boxplot()
+```
+
+## <span style="color:purple">Exercise 10:</span>
+Create more plots to figure out what is accounting for our birth differences in our scatter plot. 
+
+# <span style="color:purple">Test Your Skills</span>
+
+* Find the month/year combo with the highest total number of births.
+
+* Find the month/year combo with the least total number of births. 
+
+* Create new columns for the remaining seasons.
+
+* Compute a histogram for the daily births on weekends. 
+
+* Compute the average number of births by season. 
+
+* Extract the births for valentines day. Create a dot-plot of the values. You may have to google how to do this one.
+
+# How to research for R
+**Google is your best friend**. There are a ton of resources and online tutorials out there to help you learn R.
