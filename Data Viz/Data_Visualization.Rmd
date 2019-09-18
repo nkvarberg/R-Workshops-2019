@@ -1,0 +1,449 @@
+---
+title: "Data Visualization in R"
+author: "Michael Ramsey"
+date: "October 15, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+![](LISA_pic.jpg)
+
+# Agenda
+
+1. Resources
+
+2. Data Visualization Resources
+
+3. How to Research R
+
+4. Preliminaries
+
+5. Quick Plots
+
+6. Histograms/Density Plots
+
+7. Boxplot/Violin Plots
+
+8. Scatter Plots
+
+9. Other Plots
+
+10. Test Your Skills
+
+# Resources
+
+#### R for Data Science - Book
+
+*  http://r4ds.had.co.nz
+
+#### Base R cheat sheet
+
+* https://www.rstudio.com/wp-content/uploads/2016/05/base-r.pdf
+
+#### R markdown cheat sheet
+
+* https://www.rstudio.com/wp-content/uploads/2015/02/rmarkdown-cheatsheet.pdf
+
+#### dyplyr cheat sheet - data wrangling
+
+* https://www.rstudio.com/wp-content/uploads/2015/02/data-wrangling-cheatsheet.pdf
+
+# Data Visualization Resources
+
+#### ggplot cheat sheet
+
+* https://www.rstudio.com/wp-content/uploads/2015/03/ggplot2-cheatsheet.pdf
+
+#### qplots
+
+* http://www.sthda.com/english/wiki/qplot-quick-plot-with-ggplot2-r-software-and-data-visualization
+
+#### Histograms/Density plots
+
+* http://www.sthda.com/english/wiki/ggplot2-histogram-plot-quick-start-guide-r-software-and-data-visualization
+
+#### Boxplots/Violin plots
+
+* http://www.sthda.com/english/wiki/ggplot2-box-plot-quick-start-guide-r-software-and-data-visualization
+
+#### Scatter plots
+
+* http://www.sthda.com/english/wiki/ggplot2-scatter-plots-quick-start-guide-r-software-and-data-visualization
+
+# How to research for R
+**Google is your best friend**. There are a ton of resources and online tutorials out there to help you learn R.
+
+# Preliminaries
+
+Let's open up a script, save the file, set our working directory, and get started. We will be working with a dataset from the fivethrityeight package again. If you have not yet installed this package, run "install.packages("fivethiryeight")" in the R-console. You will also need the "gridExtra" package. This will allow us to plot multiple plots on the same figure. Now let's load our libraries. 
+
+## <span style="color:purple">Exercise 1:</span>
+If you do not have the packages already, install the tidyverse, fivethirtyeight, and gridExtra.
+
+```{r echo = TRUE, message = F, warning = F}
+library(tidyverse)
+library(fivethirtyeight)
+library(gridExtra)
+```
+
+The specific data that we will use is on the Bechdel Movie Test. The test judges a movie based on  three criteria: (1) it has to have at least two women in it, who (2) who talk to each other, about (3) something besides a man. Let's load our data and take a look.
+
+
+```{r echo = TRUE, message = F, warning = F}
+# Load and view the data
+bech_data <- bechdel
+View(bech_data)
+str(bech_data)
+```
+
+```{r echo = TRUE, message = F, warning = F}
+# Rescale Columns
+bech_data$budget = bech_data$budget/1000000
+bech_data$domgross = bech_data$domgross/1000000
+bech_data$intgross = bech_data$intgross/1000000
+```
+
+Let's check out the CRAN page to get more information about the dataset. CRAN is resource that you can use to learn about the specific packages that you are using. Let's google "fivethirtyeight CRAN".
+
+# Quick Plots
+
+Now that we are familiar with our data, let's start of with some qplots. The 'q' stands for quick in qplots. This is just a way to produce quick plots for on-the-fly data visualization. We highly recommend you use the ggplot method of plotting, which we will begin covering in the next section and spend most of today working with. However, quick plots can be useful at times. Let's try a few examples.
+
+```{r echo = TRUE, message = F, warning = F}
+# Boxplot by year of movie budget
+qplot(data = bech_data, x = as.factor(year), y= domgross, geom = 'boxplot')
+```
+
+## <span style="color:red">Format for a qplot</span>
+
+```{r echo = TRUE, message = F, warning = F, eval = F}
+# How to make a quick plot
+qplot(data = "data_frame", x = "x_variable", y = "y_variable", geom = "whatever_plot_you_want")
+```
+
+Let's try a few more examples.
+
+```{r echo = TRUE, message = F, warning = F}
+# Boxplot of movie budget by period_code reversed
+qplot(data = bech_data, x = as.factor(desc(period_code)+5), y= domgross, geom = 'boxplot')
+```
+
+```{r echo = TRUE, message = F, warning = F}
+# Violin plot of period_code reversed
+qplot(data = bech_data, x = as.factor(desc(period_code)+5), y= domgross, geom = 'violin')
+```
+
+## <span style="color:purple">Exercise 2:</span>
+Make a quick plot of movie budget vs. domestic gross revenue using a "point" geometry.
+
+# <span style="color:red">Possible geometries for qplots</span>
+
+* point
+
+* smooth
+
+* line
+
+* dotplot
+
+* boxplot
+
+* violin
+
+* histogram
+
+* density
+
+* etc.
+
+## <span style="color:red">Format for a ggplot</span>
+
+Now let's start using ggplot. We have much more flexibility with the ggplot framework. Let's make the same boxplot for period_code as we did in the qplot using ggplot.
+
+```{r echo = TRUE, message = F, warning = F, eval = F}
+# How to make a ggplot
+ggplot(data = "data_frame", aes(x = "x_variable", y = "y_variable", color/fill = "another_variable")) +
+  "geometry" +
+  "whatever_other_layers_you_want"
+```
+
+# Histogram/Density plot
+
+The goal of histograms and density plots is to get an idea about the distribution of the data. Let's create a histogram of the domestic gross revenue.
+
+#### Vanilla Histogram
+
+```{r echo = TRUE, message = F, warning = F}
+# Histogram of domestic gross revenue
+ggplot(data = bech_data, aes(x = domgross)) + 
+  geom_histogram()
+```
+
+Congratulations! You have made your first ggplot! Now let's go over how to add some basic additions to our plots that will make them so much better.
+
+#### Interpreting as Probability
+
+Currenly the y-axis is listed as a count. Let's change that so we can interpret the y-axis as a probability. 
+
+```{r echo = TRUE, message = F, warning = F}
+# Histogram of domestic gross revenue as probability
+ggplot(data = bech_data, aes(x = domgross, y = ..density..)) + 
+  geom_histogram()
+```
+
+#### Add a Title and axis labels
+
+```{r echo = TRUE, message = F, warning = F}
+# Histogram of domestic gross revenue as probability with title and labels
+ggplot(data = bech_data, aes(x = domgross, y = ..density..)) + 
+  geom_histogram() + 
+  ggtitle("Distibution of Domestic Gross Revenue for Movies") + 
+  xlab("Domestic Gross Revenue")
+```
+
+## <span style="color:purple">Exercise 3:</span>
+Make a histogram of the movie budgets. Interpret the y-axis as a probability and make sure that there is an apporpriate title and axis labels.
+
+#### Change color/fill
+
+```{r echo = TRUE, message = F, warning = F}
+# Change color/gill of histogram
+
+plot1 <- ggplot(data = bech_data, aes(x = domgross, y = ..density..)) + 
+  geom_histogram(color = 'blue') + 
+  ggtitle("Outlining the histogram") + 
+  xlab("Domestic Gross Revenue")
+
+plot2 <- ggplot(data = bech_data, aes(x = domgross, y = ..density..)) + 
+  geom_histogram(fill = 'green') + 
+  ggtitle("Filling the histogram") + 
+  xlab("Domestic Gross Revenue")
+
+grid.arrange(plot1, plot2, ncol=2)
+```
+
+#### Change number of bins
+
+```{r echo = TRUE, message = F, warning = F}
+# Vary the number of bins per histogram
+bin60 <- ggplot(data = bech_data, aes(x = domgross, y = ..density..)) + 
+  geom_histogram(bins = 60) + 
+  ggtitle("60 bins") + 
+  xlab("Domestic Gross Revenue")
+bin30 <- ggplot(data = bech_data, aes(x = domgross, y = ..density..)) + 
+  geom_histogram() + 
+  ggtitle("30 bins") + 
+  xlab("Domestic Gross Revenue")
+bin15 <- ggplot(data = bech_data, aes(x = domgross, y = ..density..)) + 
+  geom_histogram() + 
+  ggtitle("15 bins") + 
+  xlab("Domestic Gross Revenue")
+
+grid.arrange(bin15, bin30, bin60, ncol=3)
+```
+
+## <span style="color:purple">Exercise 4:</span>
+Edit your histogram in Exercise 3. Choose an appropriate number of bins and colors.
+
+#### Density plots
+
+```{r echo = TRUE, message = F, warning = F}
+# Add a density plot
+ggplot(data = bech_data, aes(x = domgross, y = ..density..)) + 
+  geom_histogram(bins = 60, color = 'black', fill = 'green') + 
+  ggtitle("Distibution of Domestic Gross Revenue for Movies") + 
+  xlab("Domestic Gross Revenue") + 
+  geom_density(alpha = .4, fill = 'blue')
+```
+
+#### Histograms by group
+
+```{r echo = TRUE, message = F, warning = F}
+# Create histograms of grouped variables
+# Note: Try switching out color for fill
+ggplot(data = bech_data, aes(x = domgross, y = ..density.., color = binary)) + 
+  geom_histogram(position = "identity", bins = 60, alpha = .5) + 
+  ggtitle("Distibution of Domestic Gross Revenue for Movies") + 
+  xlab("Domestic Gross Revenue") + 
+  geom_density(alpha = .4)
+```
+
+## <span style="color:purple">Exercise 5:</span>
+Continue editing the histogram from Exercise 4. Now group the data by the outcome of the bechdel test and add density plots.
+
+#### Changing legend title
+
+```{r echo = TRUE, message = F, warning = F}
+# Change legend title
+ggplot(data = bech_data, aes(x = domgross, y = ..density.., color = binary)) + 
+  geom_histogram(position = "identity", bins = 60, alpha = .5) + 
+  ggtitle("Distibution of Domestic Gross Revenue for Movies") + 
+  xlab("Domestic Gross Revenue") + 
+  geom_density(alpha = .4) +
+  scale_color_discrete(name = "Test")
+  ggsave("Hist_Dens.png", width = 5, height = 5)
+```
+
+#### Saving Plots
+
+```{r echo = TRUE, message = F, warning = F}
+# Save your plot
+ggplot(data = bech_data, aes(x = domgross, y = ..density.., color = binary)) + 
+  geom_histogram(position = "identity", bins = 60, alpha = .5) + 
+  ggtitle("Distibution of Domestic Gross Revenue for Movies") + 
+  xlab("Domestic Gross Revenue") + 
+  geom_density(alpha = .4) +
+  scale_color_discrete(name = "Test") +
+  ggsave("Hist_Dens.png", width = 5, height = 5)
+```
+
+## <span style="color:purple">Exercise 6:</span>
+Continue editing the histogram from Exercise 5. Re-title the legend and save your plot.
+
+# Boxplot/Violin plot
+
+These plots are used to compare distributions of data. These are especially useful for comparing different groups of continuous data.
+
+#### Vanilla Boxplot
+```{r echo = TRUE, message = F, warning = F}
+# Box plot of domestic revenue by period 
+ggplot(data = bech_data, aes(x = as.factor(desc(period_code)+5), y= domgross)) + 
+  geom_boxplot(notch = T)
+```
+
+#### Add mean to boxplot
+
+```{r echo = TRUE, message = F, warning = F}
+# Add a red dot to represent the mean domestic revenue for each group of movies 
+ggplot(data = bech_data, aes(x = as.factor(desc(period_code)+5), y = domgross)) + 
+  geom_boxplot(notch = T) + 
+  stat_summary(fun.y=mean, geom="point", color = 'red')
+```
+
+#### Color/Fill by group
+
+```{r echo = TRUE, message = F, warning = F}
+# Add colors to the boxplots
+ggplot(data = bech_data, aes(x = as.factor(desc(period_code)+5), y= domgross, color = as.factor(desc(period_code)+5))) + 
+  geom_boxplot(notch = T) + 
+  stat_summary(fun.y=mean, geom="point", color = 'red')
+```
+
+## <span style="color:purple">Exercise 7:</span>
+Add a title,change the axis labels, and change the legend title to the last plot that we made.
+
+#### Box plot with multiple groups
+```{r echo = TRUE, message = F, warning = F}
+# Box plot with multiple groups with color
+ggplot(data = bech_data, aes(x = as.factor(desc(period_code)+5), y= domgross, color = binary)) + 
+  geom_boxplot(notch = T)
+```
+
+## <span style="color:purple">Exercise 8:</span>
+Instead of outlining the last boxplot in color, fill the boxplot in color. Make sure that the legend title is still changed! Use the layer "scale_fill_discrete" when "fill" is used in the aes. Use the layer "scale_color_discrete" when "color" is used in the aes.
+
+# Scatter plot
+
+These are useful for visualizing how two sets of continuous data are related. Let's plot domestic gross revenue vs. international gross revenue.
+
+#### Vanilla Scatter plot
+
+```{r echo = TRUE, message = F, warning = F}
+# Scatter plot of domestic revenue vs. international revenue
+ggplot(data = bech_data, aes(x = domgross, y = intgross)) + 
+  geom_point()
+```
+
+#### Change Size/Shape/Color of points
+
+```{r echo = TRUE, message = F, warning = F}
+# Change point size, color, and shape
+ggplot(data = bech_data, aes(x = domgross, y = intgross)) + 
+  geom_point(size = 2, shape = 5, color = 'blue')
+```
+
+#### Label Points
+
+We want to label the points with the top 10 international gross revenue. We can do this as follows.
+
+```{r echo = TRUE, message = F, warning = F}
+# Get top 10 gorssing revenues
+top10 <- bech_data %>%
+  arrange(desc(intgross)) %>%
+  slice(1:10)
+
+# Bar plot of period_code reversed
+ggplot(data = bech_data, aes(x = domgross, y = intgross)) + 
+  geom_point() + 
+  geom_point(data=top10, aes(x=domgross, y = intgross), color = 'red') +
+  geom_text(data=top10, label = top10$title)
+```
+
+#### Regression line
+
+```{r echo = TRUE, message = F, warning = F}
+# Scatter plot with regression line
+ggplot(data = bech_data, aes(x = domgross, y = intgross)) + 
+  geom_point() +
+  geom_smooth(method = 'lm', se=T)
+```
+
+## <span style="color:purple">Exercise 9:</span>
+Change the color to red and linetype to dashed in the last figure.
+
+#### Scatter plot by group
+
+```{r echo = TRUE, message = F, warning = F}
+# Scatter plot by group
+plot1 <- ggplot(data = bech_data, aes(x = domgross, y = intgross, color = binary)) + 
+  geom_point()
+plot2 <- ggplot(data = bech_data, aes(x = domgross, y = intgross, shape = binary)) + 
+  geom_point()
+
+grid.arrange(plot1,plot2,ncol=2)
+```
+
+## <span style="color:purple">Exercise 10:</span>
+Make regression lines for one of the last two scatter plots.
+
+#### Add rugs to scatter plot
+```{r echo = TRUE, message = F, warning = F}
+# Add rugs to scatter plot
+ggplot(data = bech_data, aes(x = domgross, y = intgross, color = binary)) + 
+  geom_point() + 
+  geom_rug()
+```
+
+# Other Plots
+
+#### Bar Plots
+
+```{r echo = TRUE, message = F, warning = F}
+# Bar plot of clean_test reversed
+ggplot(data = bech_data, aes(x = clean_test)) + 
+  geom_bar()
+```
+
+#### Jitter Plots
+
+```{r echo = TRUE, message = F, warning = F}
+# Jitter plot
+ggplot(data = bech_data, aes(x = clean_test, y = binary)) + 
+  geom_jitter()
+```
+
+# Test Your Skills
+Make some nice plots for fun.
+
+1. Construct a jitter plot with period_code and whether or not the movie pased the bechdel test.
+
+2. Edit the bar plot in the "Extra Plots" section to have nice colors and labels.
+
+3. Create a histogram of international gross revenue. Add a density plot and make it fancy.
+
+4. Create a violin plot of international gross renevue, grouped by the column clean_test.
+
+5. Create whatever scatter plot you want.
