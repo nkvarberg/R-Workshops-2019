@@ -1,7 +1,7 @@
 ---
 title: "Data Visualization in R"
-author: "Michael Ramsey"
-date: "October 15, 2018"
+author: "Nicholas Varberg, Adapted from Michael Ramsey"
+date: "September 18, 2019"
 output: html_document
 ---
 
@@ -127,13 +127,13 @@ qplot(data = "data_frame", x = "x_variable", y = "y_variable", geom = "whatever_
 Let's try a few more examples.
 
 ```{r echo = TRUE, message = F, warning = F}
-# Boxplot of movie budget by period_code reversed
-qplot(data = bech_data, x = as.factor(desc(period_code)+5), y= domgross, geom = 'boxplot')
+# Boxplot of movie budget
+qplot(data = bech_data, x = period_code, y= domgross, group=period_code, geom = 'boxplot')
 ```
 
 ```{r echo = TRUE, message = F, warning = F}
-# Violin plot of period_code reversed
-qplot(data = bech_data, x = as.factor(desc(period_code)+5), y= domgross, geom = 'violin')
+# Violin plot
+qplot(data = bech_data, x = period_code, y= domgross, group=period_code, geom = 'violin')
 ```
 
 ## <span style="color:purple">Exercise 2:</span>
@@ -309,8 +309,10 @@ These plots are used to compare distributions of data. These are especially usef
 
 #### Vanilla Boxplot
 ```{r echo = TRUE, message = F, warning = F}
+# change period_code to factor so that we don't have to group
+bech_data <- bech_data %>% mutate(period_code = as.factor(period_code))
 # Box plot of domestic revenue by period 
-ggplot(data = bech_data, aes(x = as.factor(desc(period_code)+5), y= domgross)) + 
+ggplot(data = bech_data, aes(x = period_code, y= domgross)) + 
   geom_boxplot(notch = T)
 ```
 
@@ -318,7 +320,7 @@ ggplot(data = bech_data, aes(x = as.factor(desc(period_code)+5), y= domgross)) +
 
 ```{r echo = TRUE, message = F, warning = F}
 # Add a red dot to represent the mean domestic revenue for each group of movies 
-ggplot(data = bech_data, aes(x = as.factor(desc(period_code)+5), y = domgross)) + 
+ggplot(data = bech_data, aes(x = period_code, y = domgross)) + 
   geom_boxplot(notch = T) + 
   stat_summary(fun.y=mean, geom="point", color = 'red')
 ```
@@ -327,7 +329,7 @@ ggplot(data = bech_data, aes(x = as.factor(desc(period_code)+5), y = domgross)) 
 
 ```{r echo = TRUE, message = F, warning = F}
 # Add colors to the boxplots
-ggplot(data = bech_data, aes(x = as.factor(desc(period_code)+5), y= domgross, color = as.factor(desc(period_code)+5))) + 
+ggplot(data = bech_data, aes(x = period_code, y= domgross, color = period_code)) + 
   geom_boxplot(notch = T) + 
   stat_summary(fun.y=mean, geom="point", color = 'red')
 ```
@@ -338,7 +340,7 @@ Add a title,change the axis labels, and change the legend title to the last plot
 #### Box plot with multiple groups
 ```{r echo = TRUE, message = F, warning = F}
 # Box plot with multiple groups with color
-ggplot(data = bech_data, aes(x = as.factor(desc(period_code)+5), y= domgross, color = binary)) + 
+ggplot(data = bech_data, aes(x = period_code, y= domgross, color = binary)) + 
   geom_boxplot(notch = T)
 ```
 
@@ -370,16 +372,16 @@ ggplot(data = bech_data, aes(x = domgross, y = intgross)) +
 We want to label the points with the top 10 international gross revenue. We can do this as follows.
 
 ```{r echo = TRUE, message = F, warning = F}
-# Get top 10 gorssing revenues
-top10 <- bech_data %>%
+# Get top 5 gorssing revenues
+top5 <- bech_data %>%
   arrange(desc(intgross)) %>%
-  slice(1:10)
+  slice(1:5)
 
 # Bar plot of period_code reversed
 ggplot(data = bech_data, aes(x = domgross, y = intgross)) + 
   geom_point() + 
-  geom_point(data=top10, aes(x=domgross, y = intgross), color = 'red') +
-  geom_text(data=top10, label = top10$title)
+  geom_point(data=top5, aes(x=domgross, y = intgross), color = 'red') +
+  geom_text(data=top5, label = top5$title, nudge_y = 100)
 ```
 
 #### Regression line
